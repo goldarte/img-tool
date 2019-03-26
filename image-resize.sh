@@ -38,6 +38,58 @@ echo_bold() {
   echo -e ${TEXT}
 }
 
+# https://gist.github.com/letmaik/caa0f6cc4375cbfcc1ff26bd4530c2a3
+# https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/templates/header.sh
+my_travis_retry() {
+  local result=0
+  local count=1
+  while [ $count -le 3 ]; do
+    [ $result -ne 0 ] && {
+      echo -e "\n${ANSI_RED}The command \"$@\" failed. Retrying, $count of 3.${ANSI_RESET}\n" >&2
+    }
+    # ! { } ignores set -e, see https://stackoverflow.com/a/4073372
+    ! { "$@"; result=$?; }
+    [ $result -eq 0 ] && break
+    count=$(($count + 1))
+    sleep 1
+  done
+
+  [ $count -gt 3 ] && {
+    echo -e "\n${ANSI_RED}The command \"$@\" failed 3 times.${ANSI_RESET}\n" >&2
+  }
+
+  return $result
+}
+
+umount_system() {
+  # TEMPLATE: umount_system <MOUNT_POINT> <DEV_IMAGE>
+
+  echo_bold "Unmount chroot rootfs and boot partition: $1"
+  my_travis_retry umount -fR $1
+  losetup -d $2
+}
+
+fix_partuuid() {
+
+  local IMAGE_PATH=$1
+  local OLD_DISKID=$2
+
+  echo_bold "Mount loop-image: $IMAGE_PATH"
+  local DEV_IMAGE=$(losetup -Pf $IMAGE_PATH --show)
+  sleep 0.5
+
+  local MOUNT_POINT=$(mktemp -d --suffix=.builder_image)
+  echo_bold "Mount dirs ${MOUNT_POINT} & ${MOUNT_POINT}/boot"
+  mount "${DEV_IMAGE}p2" ${MOUNT_POINT}
+  mount "${DEV_IMAGE}p1" ${MOUNT_POINT}/boot
+
+  DISKID="$(fdisk -l "$ROOT_DEV" | sed -n 's/Disk identifier: 0x\([^ ]*\)/\1/p')"
+  sed -i "s/${OLD_DISKID}/${DISKID}/g" ${MOUNT_POINT}/etc/fstab
+  sed -i "s/${OLD_DISKID}/${DISKID}/" ${MOUNT_POINT}/boot/cmdline.txt
+
+  umount_system ${MOUNT_POINT} ${DEV_IMAGE}
+}
+
 resize_fs() {
   # TEMPLATE: resize_fs <IMAGE_PATH> <SIZE>
 
