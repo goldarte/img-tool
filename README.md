@@ -2,13 +2,13 @@
 
 Utilities for execute commands (amd64 &amp; armhf) &amp; resize the file-images.
 
-## API v0.1
+## API v0.4
 
 ### Build image
 
 ```bash
 cd repo-w-instructions
-docker run --privileged -it --rm -v /dev:/dev -v $(pwd):/builder/repo goldarte/img-tool:builder-mod
+docker run --privileged -it --rm -v /dev:/dev -v $(pwd):/builder/repo goldarte/img-tool:v0.4
 ```
 
 > * Directory `repo-w-instructions` must consist folder `builder` with the script `image-build.sh`. This script will executed in docker-container.
@@ -19,14 +19,14 @@ docker run --privileged -it --rm -v /dev:/dev -v $(pwd):/builder/repo goldarte/i
 
 ```bash
 cd folder-w-images-dir
-docker run --privileged -it --rm -v /dev:/dev -v $(pwd):/builder/repo goldarte/img-tool:builder-mod /builder/image-chroot.sh <IMAGE> [ exec <SCRIPT> [...] | copy <MOVE_FILE> <MOVE_TO> ]
+docker run --privileged -it --rm -v /dev:/dev -v $(pwd):/builder/repo goldarte/img-tool:v0.4 /builder/image-chroot.sh <IMAGE> [ exec <SCRIPT> [...] | copy <MOVE_FILE> <MOVE_TO> ]
 ```
 
 ### Resize image
 
 ```bash
 cd folder-w-images-dir
-docker run --privileged -it --rm -v /dev:/dev -v $(pwd):/builder/repo goldarte/img-tool:builder-mod /builder/image-resize.sh <IMAGE> [ min <FREE_SPACE> | max <FREE_SPACE> ]
+docker run --privileged -it --rm -v /dev:/dev -v $(pwd):/builder/repo goldarte/img-tool:v0.4 /builder/image-resize.sh <IMAGE> [ min <FREE_SPACE> | max <FREE_SPACE> ]
 ```
 
 ## License
