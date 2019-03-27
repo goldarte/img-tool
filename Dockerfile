@@ -32,4 +32,4 @@ COPY ./img-chroot /usr/sbin/
 RUN gcc -static /usr/src/qemu-wrapper.c -O3 -s -o /usr/share/qemu-wrapper
 
 WORKDIR /mnt
-CMD /mnt/builder/image-build.sh
+CMD ./builder/image-build.sh
