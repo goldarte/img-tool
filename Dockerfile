@@ -24,11 +24,12 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends bc jq unzip wget parted apt-utils git ca-certificates gawk lsof gcc libc-dev libcap2-bin
 RUN apt-get clean
 
-COPY ./*.sh /builder/
-COPY ./qemu-arm-static /builder/qemu-arm-static
-COPY ./src /builder/src
+COPY ./src /usr/src/
+COPY ./qemu-arm-static /usr/share/
+COPY ./img-resize /usr/sbin/
+COPY ./img-chroot /usr/sbin/
 
-RUN gcc -static /builder/src/qemu-wrapper.c -O3 -s -o /builder/qemu-wrapper
+RUN gcc -static /usr/src/qemu-wrapper.c -O3 -s -o /usr/share/qemu-wrapper
 
-WORKDIR /builder
-CMD ./repo/builder/image-build.sh
+WORKDIR /mnt
+CMD /mnt/builder/image-build.sh

@@ -96,6 +96,8 @@ execute() {
   && echo_stamp "OK" "SUCCESS" \
   || (echo_stamp "Failed" "ERROR"; exit 1)
 
+  set +e
+
   if [[ $# > 1 ]]; then
     echo_stamp "Copy script to chroot fs"
 
@@ -119,6 +121,7 @@ execute() {
   fi
 
   umount_system ${MOUNT_POINT} ${DEV_IMAGE}
+  set -e
 }
 
 # https://gist.github.com/letmaik/caa0f6cc4375cbfcc1ff26bd4530c2a3
